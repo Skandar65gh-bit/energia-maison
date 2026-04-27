@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EnergiaMaison — Maison Connectée</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --blue-4: #378ADD;
+      --blue-6: #185FA5;
+      --blue-8: #0C447C;
+      --bg: #F4F8FD;
+      --white: #ffffff;
+      --border: rgba(56, 100, 180, 0.12);
+      --text: #1a2a4a;
+      --muted: #6080a8;
+      --success: #1D9E75;
+      --danger: #E24B4A;
+      --radius: 16px;
+      --font: 'DM Sans', sans-serif;
+      --mono: 'DM Mono', monospace;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── AUTH PAGES ── */
+    .auth-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #EAF3FC 0%, #F4F8FD 50%, #E6F1FB 100%);
+      padding: 24px;
+    }
+
+    .auth-card {
+      background: var(--white);
+      border-radius: 24px;
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 4px 32px rgba(56, 100, 180, 0.10);
+      border: 1px solid var(--border);
+      animation: slideUp .4s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .auth-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      justify-content: center;
+    }
+
+    .auth-logo-icon {
+      width: 42px;
+      height: 42px;
+      background: var(--blue-6);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-logo-icon svg {
+      width: 24px;
+      height: 24px;
+      fill: white;
+    }
+
+    .auth-logo-text {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .auth-logo-sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .auth-title {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
+    .auth-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 28px;
+      text-align: center;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .field-wrap {
+      position: relative;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 12px 44px 12px 14px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: #F8FAFD;
+      font-family: var(--font);
+      font-size: 14px;
+      color: var(--text);
+      transition: border .2s, box-shadow .2s;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: var(--blue-4);
+      box-shadow: 0 0 0 3px rgba(55, 138, 221, .12);
+      background: white;
+    }
+
+    .field input.valid {
+      border-color: var(--success);
+    }
+
+    .field input.invalid {
+      border-color: var(--danger);
+    }
+
+    .field-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+      opacity: .4;
+      transition: opacity .2s;
+    }
+
+    .field-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .field input.valid~.field-icon {
+      opacity: 1;
+    }
+
+    .field input.valid~.field-icon svg {
+      fill: var(--success);
+    }
+
+    .field input.invalid~.field-icon svg {
+      fill: var(--danger);
+      opacity: 1;
+    }
+
+    /* Password strength bar */
+    .strength-bar {
+      display: flex;
+      gap: 4px;
+      margin-top: 8px;
+    }
+
+    .strength-seg {
+      flex: 1;
+      height: 3px;
+      border-radius: 2px;
+      background: #E6EDF5;
+      transition: background .3s;
+    }
+
+    .strength-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+
+    .strength-label {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .strength-label.active {
+      font-weight: 600;
+    }
+
+    /* Conditions list */
+    .conditions {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .cond {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: var(--muted);
+      transition: color .2s;
+    }
+
+    .cond.ok {
+      color: var(--success);
+    }
+
+    .cond.fail {
+      color: var(--danger);
+    }
+
+    .cond-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1.5px solid currentColor;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all .2s;
+    }
+
+    .cond.ok .cond-dot {
+      background: var(--success);
+      border-color: var(--success);
+    }
+
+    .cond.ok .cond-dot::after {
+      content: '';
+      width: 5px;
+      height: 3px;
+      border-left: 1.5px solid white;
+      border-bottom: 1.5px solid white;
+      transform: rotate(-45deg);
+      margin-top: -1px;
+    }
+
+    /* Tabs */
+    .auth-tabs {
+      display: flex;
+      background: #F0F5FA;
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 28px;
+      gap: 4px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 9px;
+      text-align: center;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all .2s;
+      border: none;
+      background: transparent;
+      font-family: var(--font);
+    }
+
+    .auth-tab.active {
+      background: white;
+      color: var(--blue-6);
+      box-shadow: 0 1px 4px rgba(56, 100, 180, .12);
+    }
+
+    /* Button */
+    .btn-primary {
+      width: 100%;
+      padding: 13px;
+      border-radius: 11px;
+      border: none;
+      background: var(--blue-6);
+      color: white;
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all .2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary:hover {
+      background: var(--blue-8);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(24, 95, 165, .3);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      background: #B5D4F4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Ripple */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .3);
+      transform: scale(0);
+      animation: ripple .5s linear;
+      pointer-events: none;
+    }
+
+    @keyframes ripple {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    .auth-switch {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .auth-switch a {
+      color: var(--blue-6);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .auth-switch a:hover {
+      text-decoration: underline;
+    }
+
+    .error-msg {
+      background: #FCEBEB;
+      border: 1px solid #F09595;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #A32D2D;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .error-msg.visible {
+      display: block;
+      animation: slideUp .2s ease;
+    }
+
+    /* Show/hide password */
+    .toggle-pw {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      opacity: .4;
+      transition: opacity .2s;
+    }
+
+    .toggle-pw:hover {
+      opacity: .8;
+    }
+
+    .toggle-pw svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--text);
+    }
+
+    /* ── DASHBOARD (hidden by default) ── */
+    #dashboard {
+      display: none;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--blue-6);
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: white;
+    }
+
+    .logo-text {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .logo-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: -2px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-time {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 12px;
+    }
+
+    .logout-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 11px;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all .2s;
+    }
+
+    .logout-btn:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .user-welcome {
+      background: linear-gradient(135deg, var(--blue-6), var(--blue-4));
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      color: white;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: rgba(255, 255, 255, .25);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .user-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .user-email {
+      font-size: 11px;
+      opacity: .8;
+    }
+
+    .conn-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+
+    .conn-badge.ok {
+      background: #E1F5EE;
+      color: #0F6E56;
+    }
+
+    .conn-badge.err {
+      background: #FCEBEB;
+      color: #A32D2D;
+    }
+
+    .conn-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .conn-badge.ok .conn-dot {
+      background: #1D9E75;
+      animation: pulse-dot 2s infinite;
+    }
+
+    .conn-badge.err .conn-dot {
+      background: var(--danger);
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .3
+      }
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      margin-top: 22px;
+    }
+
+    .sensor-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .sensor-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sensor-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .sensor-card.temp::before {
+      background: linear-gradient(90deg, #f97316, #ef4444);
+    }
+
+    .sensor-card.hum::before {
+      background: linear-gradient(90deg, #378ADD, #1D9E75);
+    }
+
+    .sensor-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .sensor-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse-dot 2s infinite;
+    }
+
+    .sensor-val {
+      font-family: var(--mono);
+      font-size: 36px;
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    .sensor-unit {
+      font-size: 15px;
+      color: var(--muted);
+      margin-left: 2px;
+    }
+
+    .sensor-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 20px;
+      margin-top: 10px;
+    }
+
+    .badge-warm {
+      background: #FFF0E6;
+      color: #C05010;
+    }
+
+    .badge-ok {
+      background: #E1F5EE;
+      color: #0F6E56;
+    }
+
+    .badge-high {
+      background: #E6F1FB;
+      color: #185FA5;
+    }
+
+    .energy-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .energy-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+
+    .energy-watt {
+      font-family: var(--mono);
+      font-size: 30px;
+      font-weight: 500;
+    }
+
+    .energy-lbl {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .energy-change {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--success);
+      background: #E1F5EE;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .mini-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 52px;
+    }
+
+    .mini-bar {
+      flex: 1;
+      border-radius: 4px 4px 0 0;
+      transition: height .4s;
+    }
+
+    .mini-bar.active {
+      background: var(--blue-4);
+    }
+
+    .mini-bar.inactive {
+      background: #E6F1FB;
+    }
+
+    .alert-card {
+      background: #FFF9F0;
+      border: 1px solid #F9D0A0;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: none;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .alert-card.visible {
+      display: flex;
+    }
+
+    .alert-icon {
+      width: 34px;
+      height: 34px;
+      background: #FEE4C0;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .alert-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #7a3a00;
+    }
+
+    .alert-body {
+      font-size: 11px;
+      color: #a05020;
+      margin-top: 3px;
+      line-height: 1.5;
+    }
+
+    .lights-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .light-card {
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      cursor: pointer;
+      transition: all .25s;
+      user-select: none;
+    }
+
+    .light-card.on {
+      border-color: #378ADD;
+      background: #f0f7ff;
+    }
+
+    .light-card:active {
+      transform: scale(.97);
+    }
+
+    .light-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      transition: all .25s;
+    }
+
+    .light-icon.off {
+      background: #f0f4f8;
+    }
+
+    .light-icon.on {
+      background: #378ADD;
+      box-shadow: 0 4px 18px rgba(55, 138, 221, .4);
+    }
+
+    .light-icon svg {
+      width: 22px;
+      height: 22px;
+      transition: all .25s;
+    }
+
+    .light-icon.off svg {
+      fill: #aab8cc;
+    }
+
+    .light-icon.on svg {
+      fill: white;
+    }
+
+    .light-name {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .light-room {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .light-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .light-status {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .05em;
+    }
+
+    .on-text {
+      color: var(--blue-4);
+    }
+
+    .off-text {
+      color: var(--muted);
+    }
+
+    .toggle {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: #dde5ef;
+      border-radius: 20px;
+      transition: .25s;
+      cursor: pointer;
+    }
+
+    .toggle-slider::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: white;
+      top: 3px;
+      left: 3px;
+      transition: .25s;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .15);
+    }
+
+    .toggle input:checked+.toggle-slider {
+      background: var(--blue-4);
+    }
+
+    .toggle input:checked+.toggle-slider::after {
+      transform: translateX(16px);
+    }
+
+    .brightness-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .brightness-row input[type=range] {
+      flex: 1;
+      height: 4px;
+      accent-color: var(--blue-4);
+      cursor: pointer;
+    }
+
+    .brightness-pct {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      min-width: 30px;
+      text-align: right;
+    }
+
+    .schedule-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .sched-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sched-item:last-child {
+      border-bottom: none;
+    }
+
+    .sched-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .sched-time {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--blue-6);
+      font-weight: 500;
+      min-width: 42px;
+    }
+
+    .sched-label {
+      font-size: 12px;
+      flex: 1;
+    }
+
+    .sched-pill {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .pill-on {
+      background: #E6F1FB;
+      color: #185FA5;
+    }
+
+    .pill-off {
+      background: #f0f4f8;
+      color: var(--muted);
+    }
+
+    .pill-auto {
+      background: #E1F5EE;
+      color: #0F6E56;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 36px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════════════
+     AUTH SECTION
+══════════════════════════════════════════ -->
+  <div id="auth-section">
+    <div class="auth-wrap">
+      <div class="auth-card">
+
+        <div class="auth-logo">
+          <div class="auth-logo-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+            </svg>
+          </div>
+          <div>
+            <div class="auth-logo-text">EnergiaMaison</div>
+            <div class="auth-logo-sub">Maison Connectée</div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Connexion</button>
+          <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Inscription</button>
+        </div>
+
+        <div id="error-box" class="error-msg"></div>
+
+        <!-- ── LOGIN FORM ── -->
+        <div id="form-login">
+          <p class="auth-title">Bon retour !</p>
+          <p class="auth-sub">Connectez-vous à votre maison</p>
+
+          <div class="field">
+            <label>Adresse email</label>
+            <div class="field-wrap">
+              <input type="email" id="login-email" placeholder="exemple@email.com"
+                oninput="validateEmail(this,'login-email-icon')" autocomplete="email" />
+              <span class="field-icon" id="login-email-icon">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Mot de passe</label>
+            <div class="field-wrap">
+              <input type="password" id="login-pw" placeholder="••••••••" oninput="validateLoginPw(this)"
+                autocomplete="current-password" />
+              <button class="toggle-pw" type="button" onclick="togglePw('login-pw',this)">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="btn-login" onclick="doLogin(event)" disabled>
+            Se connecter
+          </button>
+
+          <div class="auth-switch">
+            Pas encore de compte ? <a onclick="switchTab('signup')">Créer un compte</a>
+          </div>
+        </div>
+
+        <!-- ── SIGNUP FORM ── -->
+        <div id="form-signup" style="display:none">
+          <p class="auth-title">Créer un compte</p>
+          <p class="auth-sub">Rejoignez EnergiaMaison</p>
+
+          <div class="field">
+            <label>Adresse email</label>
+            <div class="field-wrap">
+              <input type="email" id="signup-email" placeholder="exemple@email.com"
+                oninput="validateEmail(this,'signup-email-icon');checkSignup()" autocomplete="email" />
+              <span class="field-icon" id="signup-email-icon">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Mot de passe</label>
+            <div class="field-wrap">
+              <input type="password" id="signup-pw" placeholder="••••••••"
+                oninput="validatePassword(this);checkSignup()" autocomplete="new-password" />
+              <button class="toggle-pw" type="button" onclick="togglePw('signup-pw',this)">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Force du mot de passe -->
+            <div class="strength-bar" id="strength-bar">
+              <div class="strength-seg" id="s1"></div>
+              <div class="strength-seg" id="s2"></div>
+              <div class="strength-seg" id="s3"></div>
+              <div class="strength-seg" id="s4"></div>
+            </div>
+            <div class="strength-labels">
+              <span class="strength-label" id="strength-text">Entrez un mot de passe</span>
+            </div>
+
+            <!-- Conditions -->
+            <div class="conditions">
+              <div class="cond" id="cond-upper">
+                <div class="cond-dot"></div>
+                Commence par une majuscule
+              </div>
+              <div class="cond" id="cond-lower">
+                <div class="cond-dot"></div>
+                Contient des minuscules
+              </div>
+              <div class="cond" id="cond-digit">
+                <div class="cond-dot"></div>
+                Contient au moins un chiffre
+              </div>
+              <div class="cond" id="cond-symbol">
+                <div class="cond-dot"></div>
+                Contient un symbole (!@#$%^&*)
+              </div>
+              <div class="cond" id="cond-length">
+                <div class="cond-dot"></div>
+                Au moins 8 caractères
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Confirmer le mot de passe</label>
+            <div class="field-wrap">
+              <input type="password" id="signup-confirm" placeholder="••••••••"
+                oninput="validateConfirm();checkSignup()" autocomplete="new-password" />
+              <button class="toggle-pw" type="button" onclick="togglePw('signup-confirm',this)">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="btn-signup" onclick="doSignup(event)" disabled>
+            Créer mon compte
+          </button>
+
+          <div class="auth-switch">
+            Déjà un compte ? <a onclick="switchTab('login')">Se connecter</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+     DASHBOARD
+══════════════════════════════════════════ -->
+  <div id="dashboard">
+    <div class="app">
+
+      <div class="header">
+        <div class="logo">
+          <div class="logo-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+            </svg>
+          </div>
+          <div>
+            <div class="logo-text">EnergiaMaison</div>
+            <div class="logo-sub">Maison Connectée — Tunis</div>
+          </div>
+        </div>
+        <div class="header-right">
+          <div class="header-time" id="clock">--:--:--</div>
+          <button class="logout-btn" onclick="doLogout()">Déconnexion</button>
+        </div>
+      </div>
+
+      <!-- Bannière utilisateur -->
+      <div class="user-welcome" id="user-welcome">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <div>
+          <div class="user-name" id="user-name">Bienvenue</div>
+          <div class="user-email" id="user-email-disp"></div>
+        </div>
+      </div>
+
+      <div class="conn-badge err" id="conn-badge">
+        <span class="conn-dot"></span>
+        <span id="conn-label">Backend déconnecté — vérifier app.py</span>
+      </div>
+
+      <div class="section-title">Capteurs en temps réel</div>
+      <div class="sensor-row">
+        <div class="sensor-card temp">
+          <div class="sensor-label"><span class="sensor-dot"></span> Température</div>
+          <div><span class="sensor-val" id="temp-val">--</span><span class="sensor-unit">°C</span></div>
+          <div class="sensor-badge badge-ok" id="temp-badge">Chargement...</div>
+        </div>
+        <div class="sensor-card hum">
+          <div class="sensor-label"><span class="sensor-dot"></span> Humidité</div>
+          <div><span class="sensor-val" id="hum-val">--</span><span class="sensor-unit">%</span></div>
+          <div class="sensor-badge badge-ok" id="hum-badge">Chargement...</div>
+        </div>
+      </div>
+
+      <div class="section-title">Consommation électrique</div>
+      <div class="energy-card">
+        <div class="energy-top">
+          <div>
+            <div class="energy-watt"><span id="watt-val">--</span> W</div>
+            <div class="energy-lbl">Puissance actuelle</div>
+          </div>
+          <div class="energy-change">Données live</div>
+        </div>
+        <div class="mini-chart" id="mini-chart"></div>
+      </div>
+
+      <div id="alert-section" style="display:none">
+        <div class="section-title">Alertes</div>
+      </div>
+      <div class="alert-card" id="alert-box">
+        <div class="alert-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#C05010">
+            <path d="M12 2L1 21h22L12 2zm0 3.5L20.5 19H3.5L12 5.5zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z" />
+          </svg>
+        </div>
+        <div>
+          <div class="alert-title">Température élevée détectée</div>
+          <div class="alert-body" id="alert-body">Activez la ventilation.</div>
+        </div>
+      </div>
+
+      <div class="section-title">Contrôle des lumières</div>
+      <div class="lights-grid" id="lights-grid"></div>
+
+      <div class="section-title">Programme automatique</div>
+      <div class="schedule-card">
+        <div class="sched-item">
+          <div class="sched-dot" style="background:#378ADD"></div>
+          <div class="sched-time">06:30</div>
+          <div class="sched-label">Chambre — allumage doux</div>
+          <div class="sched-pill pill-on">ON</div>
+        </div>
+        <div class="sched-item">
+          <div class="sched-dot" style="background:#1D9E75"></div>
+          <div class="sched-time">08:00</div>
+          <div class="sched-label">Capteur temp. → Ventilation auto</div>
+          <div class="sched-pill pill-auto">AUTO</div>
+        </div>
+        <div class="sched-item">
+          <div class="sched-dot" style="background:#378ADD"></div>
+          <div class="sched-time">18:30</div>
+          <div class="sched-label">Salon + Cuisine — lumière douce</div>
+          <div class="sched-pill pill-on">ON</div>
+        </div>
+        <div class="sched-item">
+          <div class="sched-dot" style="background:#aab8cc"></div>
+          <div class="sched-time">23:00</div>
+          <div class="sched-label">Toutes les lumières — extinction</div>
+          <div class="sched-pill pill-off">OFF</div>
+        </div>
+      </div>
+
+      <div class="footer">EnergiaMaison v2.0 · Backend Flask · ESP32 DHT22</div>
+    </div>
+  </div>
+
+  <script>
+    // ── USERS STORE (localStorage) ──────────────────────────────
+    function getUsers() { try { return JSON.parse(localStorage.getItem('em_users') || '{}'); } catch { return {}; } }
+    function saveUsers(u) { localStorage.setItem('em_users', JSON.stringify(u)); }
+    function getSession() { return localStorage.getItem('em_session'); }
+    function setSession(email) { localStorage.setItem('em_session', email); }
+    function clearSession() { localStorage.removeItem('em_session'); }
+
+    // ── BOOT ────────────────────────────────────────────────────
+    window.onload = function () {
+      const sess = getSession();
+      if (sess) { showDashboard(sess); }
+    };
+
+    // ── TAB SWITCH ───────────────────────────────────────────────
+    function switchTab(tab) {
+      document.getElementById('form-login').style.display = tab === 'login' ? '' : 'none';
+      document.getElementById('form-signup').style.display = tab === 'signup' ? '' : 'none';
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+      hideError();
+    }
+
+    // ── VALIDATION HELPERS ───────────────────────────────────────
+    function validateEmail(input, iconId) {
+      const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value);
+      input.classList.toggle('valid', ok && input.value.length > 0);
+      input.classList.toggle('invalid', !ok && input.value.length > 0);
+      return ok;
+    }
+
+    function validateLoginPw(input) {
+      const ok = input.value.length >= 1;
+      // Enable login button if both fields ok
+      const emailOk = validateEmail(document.getElementById('login-email'), 'login-email-icon');
+      document.getElementById('btn-login').disabled = !(emailOk && ok);
+    }
+
+    // Password conditions
+    const conds = {
+      upper: v => /^[A-Z]/.test(v),
+      lower: v => /[a-z]/.test(v),
+      digit: v => /[0-9]/.test(v),
+      symbol: v => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(v),
+      length: v => v.length >= 8,
+    };
+    const strengthColors = ['#E24B4A', '#E8863C', '#EF9F27', '#1D9E75'];
+    const strengthLabels = ['Très faible', 'Faible', 'Moyen', 'Fort', 'Très fort'];
+
+    function validatePassword(input) {
+      const v = input.value;
+      let score = 0;
+      Object.entries(conds).forEach(([key, fn]) => {
+        const ok = fn(v);
+        if (ok) score++;
+        const el = document.getElementById('cond-' + key);
+        el.classList.toggle('ok', ok);
+        el.classList.toggle('fail', !ok && v.length > 0);
+      });
+      // Strength bar
+      const segs = ['s1', 's2', 's3', 's4'];
+      segs.forEach((id, i) => {
+        const el = document.getElementById(id);
+        el.style.background = i < score ? strengthColors[Math.min(score - 1, 3)] : '#E6EDF5';
+      });
+      document.getElementById('strength-text').textContent =
+        v.length === 0 ? 'Entrez un mot de passe' : strengthLabels[Math.min(score, 4)];
+      input.classList.toggle('valid', score === 5);
+      input.classList.toggle('invalid', score < 5 && v.length > 0);
+      return score === 5;
+    }
+
+    function validateConfirm() {
+      const pw = document.getElementById('signup-pw').value;
+      const cf = document.getElementById('signup-confirm');
+      const ok = cf.value === pw && cf.value.length > 0;
+      cf.classList.toggle('valid', ok);
+      cf.classList.toggle('invalid', !ok && cf.value.length > 0);
+      return ok;
+    }
+
+    function checkSignup() {
+      const emailOk = validateEmail(document.getElementById('signup-email'), 'signup-email-icon');
+      const pwOk = validatePassword(document.getElementById('signup-pw'));
+      const cfOk = validateConfirm();
+      document.getElementById('btn-signup').disabled = !(emailOk && pwOk && cfOk);
+    }
+
+    // ── TOGGLE PASSWORD VISIBILITY ──────────────────────────────
+    function togglePw(id, btn) {
+      const input = document.getElementById(id);
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      btn.style.opacity = show ? '0.8' : '0.4';
+    }
+
+    // ── ERROR DISPLAY ─────────────────────────────────────────────
+    function showError(msg) {
+      const el = document.getElementById('error-box');
+      el.textContent = msg;
+      el.classList.add('visible');
+    }
+    function hideError() {
+      document.getElementById('error-box').classList.remove('visible');
+    }
+
+    // ── RIPPLE EFFECT ─────────────────────────────────────────────
+    function addRipple(btn, e) {
+      const r = document.createElement('span');
+      r.className = 'ripple';
+      const rect = btn.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      r.style.width = r.style.height = size + 'px';
+      r.style.left = (e.clientX - rect.left - size / 2) + 'px';
+      r.style.top = (e.clientY - rect.top - size / 2) + 'px';
+      btn.appendChild(r);
+      setTimeout(() => r.remove(), 600);
+    }
+
+    // ── LOGIN ────────────────────────────────────────────────────
+    function doLogin(e) {
+      addRipple(e.currentTarget, e);
+      hideError();
+      const email = document.getElementById('login-email').value.trim();
+      const pw = document.getElementById('login-pw').value;
+      const users = getUsers();
+      if (!users[email]) { showError('Aucun compte trouvé avec cet email.'); return; }
+      if (users[email].password !== btoa(pw)) { showError('Mot de passe incorrect.'); return; }
+      setSession(email);
+      showDashboard(email);
+    }
+
+    // ── SIGNUP ───────────────────────────────────────────────────
+    function doSignup(e) {
+      addRipple(e.currentTarget, e);
+      hideError();
+      const email = document.getElementById('signup-email').value.trim();
+      const pw = document.getElementById('signup-pw').value;
+      const users = getUsers();
+      if (users[email]) { showError('Un compte existe déjà avec cet email.'); return; }
+      users[email] = { password: btoa(pw), email };
+      saveUsers(users);
+      setSession(email);
+      showDashboard(email);
+    }
+
+    // ── LOGOUT ───────────────────────────────────────────────────
+    function doLogout() {
+      clearSession();
+      document.getElementById('auth-section').style.display = '';
+      document.getElementById('dashboard').style.display = 'none';
+      document.getElementById('login-email').value = '';
+      document.getElementById('login-pw').value = '';
+      document.getElementById('btn-login').disabled = true;
+    }
+
+    // ── SHOW DASHBOARD ───────────────────────────────────────────
+    function showDashboard(email) {
+      document.getElementById('auth-section').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      // User info
+      const initials = email[0].toUpperCase();
+      document.getElementById('user-avatar').textContent = initials;
+      document.getElementById('user-name').textContent = 'Bonjour, ' + email.split('@')[0];
+      document.getElementById('user-email-disp').textContent = email;
+      // Init dashboard
+      initDashboard();
+    }
+
+    // ══════════════════════════════════════════
+    // DASHBOARD LOGIC
+    // ══════════════════════════════════════════
+    const API = 'http://localhost:5000/api';
+    const lights = {
+      salon: { name: 'Salon', room: 'Pièce principale', on: true, brightness: 80 },
+      cuisine: { name: 'Cuisine', room: 'Zone repas', on: false, brightness: 60 },
+      chambre: { name: 'Chambre', room: 'Étage 1', on: false, brightness: 40 },
+      bureau: { name: 'Bureau', room: 'Télétravail', on: true, brightness: 100 },
+    };
+    const wattHistory = [];
+    const bulbSVG = `<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.6 1.4 4.9 3.5 6.2V17a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-1.8C17.6 13.9 19 11.6 19 9a7 7 0 0 0-7-7zm-1 17h2v1h-2v-1z"/></svg>`;
+
+    function setConnected(ok) {
+      const b = document.getElementById('conn-badge');
+      const l = document.getElementById('conn-label');
+      b.className = 'conn-badge ' + (ok ? 'ok' : 'err');
+      l.textContent = ok ? 'Backend ESP32 connecté' : 'Backend déconnecté — vérifier app.py';
+    }
+
+    async function fetchSensors() {
+      try {
+        const res = await fetch(`${API}/sensors`);
+        if (!res.ok) throw new Error();
+        const d = await res.json();
+        setConnected(true);
+        document.getElementById('temp-val').textContent = d.temperature;
+        document.getElementById('hum-val').textContent = d.humidity;
+        const tb = document.getElementById('temp-badge');
+        const ab = document.getElementById('alert-box');
+        const as = document.getElementById('alert-section');
+        if (d.temperature >= 27) {
+          tb.className = 'sensor-badge badge-high'; tb.textContent = 'Trop chaud';
+          ab.classList.add('visible'); as.style.display = '';
+          document.getElementById('alert-body').textContent = `${d.temperature}°C — activez la ventilation.`;
+        } else if (d.temperature >= 24) {
+          tb.className = 'sensor-badge badge-warm'; tb.textContent = 'Légèrement chaud';
+          ab.classList.add('visible'); as.style.display = '';
+        } else {
+          tb.className = 'sensor-badge badge-ok'; tb.textContent = 'Confort optimal';
+          ab.classList.remove('visible'); as.style.display = 'none';
+        }
+        const hb = document.getElementById('hum-badge');
+        if (d.humidity > 70) { hb.className = 'sensor-badge badge-high'; hb.textContent = 'Humidité élevée'; }
+        else if (d.humidity < 40) { hb.className = 'sensor-badge badge-warm'; hb.textContent = 'Air sec'; }
+        else { hb.className = 'sensor-badge badge-ok'; hb.textContent = 'Niveau optimal'; }
+      } catch { setConnected(false); }
+    }
+
+    async function fetchLights() {
+      try {
+        const res = await fetch(`${API}/lights`);
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        Object.assign(lights, data);
+        renderLights();
+      } catch { renderLights(); }
+    }
+
+    async function toggleLight(id) {
+      lights[id].on = !lights[id].on;
+      renderLights();
+      try {
+        await fetch(`${API}/lights/${id}`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ on: lights[id].on }),
+        });
+      } catch { }
+    }
+
+    async function setBrightness(id, val) {
+      lights[id].brightness = +val;
+      updateWatts();
+      try {
+        await fetch(`${API}/lights/${id}`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ brightness: +val }),
+        });
+      } catch { }
+    }
+
+    function renderLights() {
+      document.getElementById('lights-grid').innerHTML = Object.entries(lights).map(([id, l]) => `
+    <div class="light-card ${l.on ? 'on' : ''}" onclick="toggleLight('${id}')">
+      <div class="light-icon ${l.on ? 'on' : 'off'}">${bulbSVG}</div>
+      <div class="light-name">${l.name}</div>
+      <div class="light-room">${l.room}</div>
+      <div class="light-footer">
+        <span class="light-status ${l.on ? 'on-text' : 'off-text'}">${l.on ? 'ALLUMÉ' : 'ÉTEINT'}</span>
+        <label class="toggle" onclick="event.stopPropagation()">
+          <input type="checkbox" ${l.on ? 'checked' : ''} onchange="toggleLight('${id}')">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      ${l.on ? `<div class="brightness-row">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="#aab8cc"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.2 4.2l1.4 1.4m12.8 12.8-1.4-1.4M2 12h2m16 0h2M4.2 19.8l1.4-1.4m12.8-12.8-1.4 1.4" stroke="#aab8cc" stroke-width="1.5" fill="none"/></svg>
+        <input type="range" min="10" max="100" value="${l.brightness}"
+          oninput="setBrightness('${id}',this.value);document.getElementById('brp-${id}').textContent=this.value+'%'">
+        <span class="brightness-pct" id="brp-${id}">${l.brightness}%</span>
+      </div>`: ''}
+    </div>
+  `).join('');
+      updateWatts();
+    }
+
+    function updateWatts() {
+      const total = Object.values(lights).reduce((s, l) => s + (l.on ? Math.round(l.brightness * .6) : 0), 80);
+      document.getElementById('watt-val').textContent = total;
+      wattHistory.push(total);
+      if (wattHistory.length > 12) wattHistory.shift();
+      const max = Math.max(...wattHistory, 1);
+      document.getElementById('mini-chart').innerHTML = wattHistory.map((v, i) =>
+        `<div class="mini-bar ${i === wattHistory.length - 1 ? 'active' : 'inactive'}" style="height:${Math.round(v / max * 100)}%"></div>`
+      ).join('');
+    }
+
+    function updateClock() {
+      document.getElementById('clock').textContent =
+        new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    function initDashboard() {
+      renderLights();
+      updateClock();
+      fetchSensors();
+      fetchLights();
+      setInterval(updateClock, 1000);
+      setInterval(fetchSensors, 5000);
+      setInterval(fetchLights, 10000);
+    }
+  </script>
+</body>
+
+</html>
