@@ -4,8 +4,8 @@ Projet IoT avec ESP32 + DHT22
 
 ## Technologies
 - ESP32 (Arduino)
-- Python (Flask ou autre)
-- HTML
+- Python (Flask)
+- HTML/css/python
 
 ## Installation
 pip install -r requirements.txt
