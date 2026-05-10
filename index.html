@@ -9,6 +9,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
     rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -20,6 +21,8 @@
       --blue-4: #378ADD;
       --blue-6: #185FA5;
       --blue-8: #0C447C;
+      --blue-1: #E6F1FB;
+      --blue-2: #B5D4F4;
       --bg: #F4F8FD;
       --white: #ffffff;
       --border: rgba(56, 100, 180, 0.12);
@@ -39,25 +42,127 @@
       min-height: 100vh;
     }
 
-    /* ── AUTH PAGES ── */
+    /* ══ AUTH SPLIT LAYOUT ══ */
     .auth-wrap {
       min-height: 100vh;
       display: flex;
+      flex-direction: row;
+      padding: 0;
+      background: var(--white);
+    }
+
+    .auth-left {
+      flex: 1.2;
+      background: #0b1120;
+      display: flex;
+      align-items: flex-end;
+      padding: 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-left-bg {
+      position: absolute;
+      top: -10%; left: -10%; right: -10%; bottom: -10%;
+      background: url('/static/bg.png') no-repeat center center / cover;
+      animation: slowPan 25s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+    
+    @keyframes slowPan {
+      0% { transform: scale(1) translate(0, 0); }
+      100% { transform: scale(1.15) translate(-2%, 2%); }
+    }
+    
+    .auth-left::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(to top, rgba(11, 17, 32, 0.95) 0%, rgba(11, 17, 32, 0.3) 100%);
+      z-index: 1;
+    }
+
+    /* 3D SCENE -> MODERN WARM HOUSE */
+    .scene {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 500px; height: 500px;
+      z-index: 2;
+      display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #EAF3FC 0%, #F4F8FD 50%, #E6F1FB 100%);
-      padding: 24px;
+    }
+
+    .house-image {
+      width: 120%;
+      height: 120%;
+      object-fit: cover;
+      border-radius: 50%;
+      -webkit-mask-image: radial-gradient(circle, black 50%, transparent 70%);
+      mask-image: radial-gradient(circle, black 50%, transparent 70%);
+      animation: floatImage 8s ease-in-out infinite;
+      filter: drop-shadow(0 0 30px rgba(0,0,0,0.5));
+    }
+
+    @keyframes floatImage {
+      0% { transform: translateY(0px) scale(1); filter: drop-shadow(0 0 30px rgba(0,0,0,0.5)); }
+      50% { transform: translateY(-15px) scale(1.02); filter: drop-shadow(0 0 45px rgba(55, 138, 221, 0.4)); }
+      100% { transform: translateY(0px) scale(1); filter: drop-shadow(0 0 30px rgba(0,0,0,0.5)); }
+    }
+
+    .auth-left-content {
+      position: relative;
+      z-index: 3;
+      color: white;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .auth-left-content h1 {
+      font-size: 38px;
+      margin-bottom: 16px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+    
+    .auth-left-content p {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.8);
+      max-width: 400px;
+      line-height: 1.5;
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+
+    .auth-right {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--white);
+      padding: 40px;
+      overflow-y: auto;
     }
 
     .auth-card {
-      background: var(--white);
-      border-radius: 24px;
-      padding: 40px 36px;
+      background: transparent;
+      padding: 0;
       width: 100%;
-      max-width: 420px;
-      box-shadow: 0 4px 32px rgba(56, 100, 180, 0.10);
-      border: 1px solid var(--border);
+      max-width: 400px;
+      box-shadow: none;
+      border: none;
       animation: slideUp .4s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    @media (max-width: 900px) {
+      .auth-left { display: none; }
+      .auth-right { padding: 24px; }
+      .auth-card { padding: 32px; background: var(--white); box-shadow: 0 4px 32px rgba(56, 100, 180, 0.10); border: 1px solid var(--border); border-radius: 24px; }
+      .auth-wrap { background: linear-gradient(135deg, #EAF3FC 0%, #F4F8FD 50%, #E6F1FB 100%); align-items: center; justify-content: center; }
     }
 
     @keyframes slideUp {
@@ -99,7 +204,6 @@
     .auth-logo-text {
       font-size: 20px;
       font-weight: 600;
-      color: var(--text);
     }
 
     .auth-logo-sub {
@@ -107,10 +211,39 @@
       color: var(--muted);
     }
 
+    .auth-tabs {
+      display: flex;
+      background: #F0F5FA;
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 28px;
+      gap: 4px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 9px;
+      text-align: center;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all .2s;
+      border: none;
+      background: transparent;
+      font-family: var(--font);
+    }
+
+    .auth-tab.active {
+      background: white;
+      color: var(--blue-6);
+      box-shadow: 0 1px 4px rgba(56, 100, 180, .12);
+    }
+
     .auth-title {
       font-size: 22px;
       font-weight: 600;
-      color: var(--text);
       margin-bottom: 4px;
       text-align: center;
     }
@@ -167,37 +300,29 @@
       border-color: var(--danger);
     }
 
-    .field-icon {
+    .toggle-pw {
       position: absolute;
       right: 12px;
       top: 50%;
       transform: translateY(-50%);
-      width: 20px;
-      height: 20px;
-      pointer-events: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
       opacity: .4;
       transition: opacity .2s;
     }
 
-    .field-icon svg {
-      width: 20px;
-      height: 20px;
+    .toggle-pw:hover {
+      opacity: .8;
     }
 
-    .field input.valid~.field-icon {
-      opacity: 1;
+    .toggle-pw svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--text);
     }
 
-    .field input.valid~.field-icon svg {
-      fill: var(--success);
-    }
-
-    .field input.invalid~.field-icon svg {
-      fill: var(--danger);
-      opacity: 1;
-    }
-
-    /* Password strength bar */
     .strength-bar {
       display: flex;
       gap: 4px;
@@ -212,22 +337,12 @@
       transition: background .3s;
     }
 
-    .strength-labels {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 4px;
-    }
-
     .strength-label {
       font-size: 10px;
       color: var(--muted);
+      margin-top: 4px;
     }
 
-    .strength-label.active {
-      font-weight: 600;
-    }
-
-    /* Conditions list */
     .conditions {
       margin-top: 10px;
       display: flex;
@@ -279,38 +394,6 @@
       margin-top: -1px;
     }
 
-    /* Tabs */
-    .auth-tabs {
-      display: flex;
-      background: #F0F5FA;
-      border-radius: 12px;
-      padding: 4px;
-      margin-bottom: 28px;
-      gap: 4px;
-    }
-
-    .auth-tab {
-      flex: 1;
-      padding: 9px;
-      text-align: center;
-      border-radius: 9px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      color: var(--muted);
-      transition: all .2s;
-      border: none;
-      background: transparent;
-      font-family: var(--font);
-    }
-
-    .auth-tab.active {
-      background: white;
-      color: var(--blue-6);
-      box-shadow: 0 1px 4px rgba(56, 100, 180, .12);
-    }
-
-    /* Button */
     .btn-primary {
       width: 100%;
       padding: 13px;
@@ -328,24 +411,103 @@
       overflow: hidden;
     }
 
-    .btn-primary:hover {
+    .btn-primary:hover:not(:disabled) {
       background: var(--blue-8);
       transform: translateY(-1px);
       box-shadow: 0 4px 16px rgba(24, 95, 165, .3);
     }
 
-    .btn-primary:active {
-      transform: translateY(0);
-    }
-
     .btn-primary:disabled {
       background: #B5D4F4;
       cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
     }
 
-    /* Ripple */
+    .btn-face {
+      width: 100%;
+      padding: 12px;
+      border-radius: 11px;
+      border: 1.5px solid var(--blue-4);
+      background: var(--blue-1);
+      color: var(--blue-6);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-face:hover:not(:disabled) {
+      background: var(--blue-2);
+      transform: translateY(-1px);
+    }
+
+    .btn-face:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-face svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--blue-6);
+    }
+
+    .face-status {
+      font-size: 12px;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-top: 8px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      line-height: 1.4;
+    }
+
+    .face-status.loading {
+      display: flex;
+      background: #EAF3FC;
+      color: var(--blue-6);
+    }
+
+    .face-status.ok {
+      display: flex;
+      background: #E1F5EE;
+      color: #0F6E56;
+    }
+
+    .face-status.err {
+      display: flex;
+      background: #FCEBEB;
+      color: #A32D2D;
+    }
+
+    .face-pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse-dot 1s infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .3
+      }
+    }
+
     .ripple {
       position: absolute;
       border-radius: 50%;
@@ -362,24 +524,6 @@
       }
     }
 
-    .auth-switch {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .auth-switch a {
-      color: var(--blue-6);
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    .auth-switch a:hover {
-      text-decoration: underline;
-    }
-
     .error-msg {
       background: #FCEBEB;
       border: 1px solid #F09595;
@@ -393,34 +537,41 @@
 
     .error-msg.visible {
       display: block;
-      animation: slideUp .2s ease;
     }
 
-    /* Show/hide password */
-    .toggle-pw {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
+    .auth-switch {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .auth-switch a {
+      color: var(--blue-6);
+      font-weight: 600;
       cursor: pointer;
-      padding: 0;
-      opacity: .4;
-      transition: opacity .2s;
     }
 
-    .toggle-pw:hover {
-      opacity: .8;
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 14px 0;
     }
 
-    .toggle-pw svg {
-      width: 18px;
-      height: 18px;
-      fill: var(--text);
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
     }
 
-    /* ── DASHBOARD (hidden by default) ── */
+    .divider-text {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* ══ DASHBOARD ══ */
     #dashboard {
       display: none;
     }
@@ -435,7 +586,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 28px;
+      margin-bottom: 20px;
     }
 
     .logo {
@@ -516,14 +667,14 @@
     }
 
     .user-avatar {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       background: rgba(255, 255, 255, .25);
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 600;
     }
 
@@ -532,9 +683,18 @@
       font-weight: 600;
     }
 
-    .user-email {
+    .user-email-disp {
       font-size: 11px;
       opacity: .8;
+    }
+
+    .user-badge {
+      font-size: 10px;
+      background: rgba(255, 255, 255, .2);
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-top: 3px;
+      display: inline-block;
     }
 
     .conn-badge {
@@ -571,18 +731,6 @@
 
     .conn-badge.err .conn-dot {
       background: var(--danger);
-    }
-
-    @keyframes pulse-dot {
-
-      0%,
-      100% {
-        opacity: 1
-      }
-
-      50% {
-        opacity: .3
-      }
     }
 
     .section-title {
@@ -660,7 +808,6 @@
 
     .sensor-badge {
       display: inline-flex;
-      align-items: center;
       font-size: 10px;
       font-weight: 600;
       padding: 3px 9px;
@@ -825,7 +972,6 @@
     .light-icon svg {
       width: 22px;
       height: 22px;
-      transition: all .25s;
     }
 
     .light-icon.off svg {
@@ -1001,17 +1147,118 @@
       font-size: 11px;
       color: var(--muted);
     }
+
+    /* Steps inscription visage */
+    .steps-face {
+      background: #F4F8FD;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .steps-face.visible {
+      display: block;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      padding: 4px 0;
+    }
+
+    .step-item.done {
+      color: var(--success);
+    }
+
+    .step-item.active {
+      color: var(--blue-6);
+      font-weight: 600;
+    }
+
+    .step-num {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1.5px solid currentColor;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-item.done .step-num {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+
+    /* Bilan Hebdomadaire */
+    .report-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border);
+    }
+    .report-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .report-icon {
+      font-size: 24px;
+      background: #F0F5FA;
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .report-title { font-weight: 600; color: var(--text); }
+    .report-subtitle { font-size: 12px; color: var(--muted); }
+    .report-summary {
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      padding: 12px;
+      background: #F9FBFE;
+      border-radius: 10px;
+    }
+    .report-ok { color: var(--success); font-weight: 500; margin-top: 4px; }
+    .report-chart { width: 100%; position: relative; }
+
   </style>
 </head>
 
 <body>
 
-  <!-- ══════════════════════════════════════════
-     AUTH SECTION
-══════════════════════════════════════════ -->
+  <!-- ══ AUTH ════════════════════════════════════════════════ -->
   <div id="auth-section">
-    <div class="auth-wrap">
-      <div class="auth-card">
+    <div class="auth-wrap split-layout">
+      
+      <!-- PANNEAU GAUCHE -->
+      <div class="auth-left">
+        <div class="auth-left-bg"></div>
+        
+        <!-- IMAGE MAISON MODERNE -->
+        <div class="scene">
+          <img src="/static/smart_connected_home.png" alt="Maison Moderne" class="house-image" />
+        </div>
+
+        <div class="auth-left-content">
+          <h1>Votre Maison Intelligente</h1>
+          <p>Gérez tous vos appareils, visualisez votre consommation et automatisez votre quotidien depuis une interface centralisée et sécurisée.</p>
+        </div>
+      </div>
+
+      <!-- PANNEAU DROIT -->
+      <div class="auth-right">
+        <div class="auth-card">
 
         <div class="auth-logo">
           <div class="auth-logo-icon">
@@ -1025,7 +1272,6 @@
           </div>
         </div>
 
-        <!-- Tabs -->
         <div class="auth-tabs">
           <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Connexion</button>
           <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Inscription</button>
@@ -1033,7 +1279,7 @@
 
         <div id="error-box" class="error-msg"></div>
 
-        <!-- ── LOGIN FORM ── -->
+        <!-- ── CONNEXION ── -->
         <div id="form-login">
           <p class="auth-title">Bon retour !</p>
           <p class="auth-sub">Connectez-vous à votre maison</p>
@@ -1042,20 +1288,13 @@
             <label>Adresse email</label>
             <div class="field-wrap">
               <input type="email" id="login-email" placeholder="exemple@email.com"
-                oninput="validateEmail(this,'login-email-icon')" autocomplete="email" />
-              <span class="field-icon" id="login-email-icon">
-                <svg viewBox="0 0 24 24">
-                  <path
-                    d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
-                </svg>
-              </span>
+                oninput="validateEmail(this);checkLogin()" autocomplete="email" />
             </div>
           </div>
-
           <div class="field">
             <label>Mot de passe</label>
             <div class="field-wrap">
-              <input type="password" id="login-pw" placeholder="••••••••" oninput="validateLoginPw(this)"
+              <input type="password" id="login-pw" placeholder="••••••••" oninput="checkLogin()"
                 autocomplete="current-password" />
               <button class="toggle-pw" type="button" onclick="togglePw('login-pw',this)">
                 <svg viewBox="0 0 24 24">
@@ -1066,16 +1305,29 @@
             </div>
           </div>
 
-          <button class="btn-primary" id="btn-login" onclick="doLogin(event)" disabled>
-            Se connecter
-          </button>
+          <button class="btn-primary" id="btn-login" onclick="doLogin(event)" disabled>Se connecter</button>
 
-          <div class="auth-switch">
-            Pas encore de compte ? <a onclick="switchTab('signup')">Créer un compte</a>
+          <div class="divider">
+            <div class="divider-line"></div><span class="divider-text">ou connexion rapide</span>
+            <div class="divider-line"></div>
           </div>
+
+          <button class="btn-face" id="btn-face-login" onclick="doFaceLogin()">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M9 11.75A1.25 1.25 0 0 1 10.25 13 1.25 1.25 0 0 1 9 14.25 1.25 1.25 0 0 1 7.75 13 1.25 1.25 0 0 1 9 11.75m6 0A1.25 1.25 0 0 1 16.25 13 1.25 1.25 0 0 1 15 14.25 1.25 1.25 0 0 1 13.75 13 1.25 1.25 0 0 1 15 11.75M12 2a10 10 0 0 0-10 10 10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 2a8 8 0 0 1 8 8 8 8 0 0 1-8 8 8 8 0 0 1-8-8 8 8 0 0 1 8-8m0 3c-2.76 0-5 1.79-5 4h2c0-1.1 1.34-2 3-2s3 .9 3 2h2c0-2.21-2.24-4-5-4m-2.5 9.5c.69 1.5 2.31 2.5 4 2.5s3.31-1 4-2.5H9.5z" />
+            </svg>
+            Se connecter par visage
+          </button>
+          <div class="face-status" id="face-login-status">
+            <div class="face-pulse"></div>
+            <span id="face-login-msg">Webcam ouverte — regardez la caméra...</span>
+          </div>
+
+          <div class="auth-switch">Pas encore de compte ? <a onclick="switchTab('signup')">Créer un compte</a></div>
         </div>
 
-        <!-- ── SIGNUP FORM ── -->
+        <!-- ── INSCRIPTION ── -->
         <div id="form-signup" style="display:none">
           <p class="auth-title">Créer un compte</p>
           <p class="auth-sub">Rejoignez EnergiaMaison</p>
@@ -1084,16 +1336,9 @@
             <label>Adresse email</label>
             <div class="field-wrap">
               <input type="email" id="signup-email" placeholder="exemple@email.com"
-                oninput="validateEmail(this,'signup-email-icon');checkSignup()" autocomplete="email" />
-              <span class="field-icon" id="signup-email-icon">
-                <svg viewBox="0 0 24 24">
-                  <path
-                    d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
-                </svg>
-              </span>
+                oninput="validateEmail(this);checkSignup()" autocomplete="email" />
             </div>
           </div>
-
           <div class="field">
             <label>Mot de passe</label>
             <div class="field-wrap">
@@ -1106,43 +1351,31 @@
                 </svg>
               </button>
             </div>
-
-            <!-- Force du mot de passe -->
-            <div class="strength-bar" id="strength-bar">
+            <div class="strength-bar">
               <div class="strength-seg" id="s1"></div>
               <div class="strength-seg" id="s2"></div>
               <div class="strength-seg" id="s3"></div>
               <div class="strength-seg" id="s4"></div>
             </div>
-            <div class="strength-labels">
-              <span class="strength-label" id="strength-text">Entrez un mot de passe</span>
-            </div>
-
-            <!-- Conditions -->
+            <div class="strength-label" id="strength-text">Entrez un mot de passe</div>
             <div class="conditions">
               <div class="cond" id="cond-upper">
-                <div class="cond-dot"></div>
-                Commence par une majuscule
+                <div class="cond-dot"></div>Commence par une majuscule
               </div>
               <div class="cond" id="cond-lower">
-                <div class="cond-dot"></div>
-                Contient des minuscules
+                <div class="cond-dot"></div>Contient des minuscules
               </div>
               <div class="cond" id="cond-digit">
-                <div class="cond-dot"></div>
-                Contient au moins un chiffre
+                <div class="cond-dot"></div>Contient au moins un chiffre
               </div>
               <div class="cond" id="cond-symbol">
-                <div class="cond-dot"></div>
-                Contient un symbole (!@#$%^&*)
+                <div class="cond-dot"></div>Contient un symbole (!@#$%^&*)
               </div>
               <div class="cond" id="cond-length">
-                <div class="cond-dot"></div>
-                Au moins 8 caractères
+                <div class="cond-dot"></div>Au moins 8 caractères
               </div>
             </div>
           </div>
-
           <div class="field">
             <label>Confirmer le mot de passe</label>
             <div class="field-wrap">
@@ -1157,32 +1390,59 @@
             </div>
           </div>
 
+          <!-- ÉTAPE 1 : Créer compte -->
           <button class="btn-primary" id="btn-signup" onclick="doSignup(event)" disabled>
-            Créer mon compte
+            Étape 1 — Créer mon compte
           </button>
 
-          <div class="auth-switch">
-            Déjà un compte ? <a onclick="switchTab('login')">Se connecter</a>
+          <!-- ÉTAPE 2 : Enregistrer visage (visible seulement après création compte) -->
+          <div class="steps-face" id="steps-face">
+            <div class="step-item done" id="step1">
+              <div class="step-num">✓</div>Compte créé avec succès
+            </div>
+            <div class="step-item active" id="step2">
+              <div class="step-num">2</div>Enregistrez votre visage pour la connexion rapide
+            </div>
+            <div class="step-item" id="step3">
+              <div class="step-num">3</div>Accès au dashboard
+            </div>
           </div>
+
+          <button class="btn-face" id="btn-face-register" onclick="doFaceRegister()" disabled style="display:none">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M9 11.75A1.25 1.25 0 0 1 10.25 13 1.25 1.25 0 0 1 9 14.25 1.25 1.25 0 0 1 7.75 13 1.25 1.25 0 0 1 9 11.75m6 0A1.25 1.25 0 0 1 16.25 13 1.25 1.25 0 0 1 15 14.25 1.25 1.25 0 0 1 13.75 13 1.25 1.25 0 0 1 15 11.75M12 2a10 10 0 0 0-10 10 10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 2a8 8 0 0 1 8 8 8 8 0 0 1-8 8 8 8 0 0 1-8-8 8 8 0 0 1 8-8m0 3c-2.76 0-5 1.79-5 4h2c0-1.1 1.34-2 3-2s3 .9 3 2h2c0-2.21-2.24-4-5-4m-2.5 9.5c.69 1.5 2.31 2.5 4 2.5s3.31-1 4-2.5H9.5z" />
+            </svg>
+            Étape 2 — Enregistrer mon visage
+          </button>
+
+          <div class="face-status" id="face-reg-status">
+            <div class="face-pulse"></div>
+            <span id="face-reg-msg"></span>
+          </div>
+
+          <!-- Bouton passer cette étape -->
+          <button class="btn-face" id="btn-skip-face" onclick="skipFace()"
+            style="display:none;margin-top:6px;background:#f4f4f4;border-color:#dde5ef;color:var(--muted);">
+            Passer cette étape → accéder au dashboard
+          </button>
+
+          <div class="auth-switch">Déjà un compte ? <a onclick="switchTab('login')">Se connecter</a></div>
         </div>
 
       </div>
-    </div>
-  </div>
+      </div> <!-- Fin auth-right -->
+    </div> <!-- Fin auth-wrap -->
+  </div> <!-- Fin auth-section -->
 
-  <!-- ══════════════════════════════════════════
-     DASHBOARD
-══════════════════════════════════════════ -->
+  <!-- ══ DASHBOARD ════════════════════════════════════════════ -->
   <div id="dashboard">
     <div class="app">
-
       <div class="header">
         <div class="logo">
-          <div class="logo-icon">
-            <svg viewBox="0 0 24 24">
+          <div class="logo-icon"><svg viewBox="0 0 24 24">
               <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-            </svg>
-          </div>
+            </svg></div>
           <div>
             <div class="logo-text">EnergiaMaison</div>
             <div class="logo-sub">Maison Connectée — Tunis</div>
@@ -1194,12 +1454,12 @@
         </div>
       </div>
 
-      <!-- Bannière utilisateur -->
-      <div class="user-welcome" id="user-welcome">
+      <div class="user-welcome">
         <div class="user-avatar" id="user-avatar">?</div>
         <div>
           <div class="user-name" id="user-name">Bienvenue</div>
-          <div class="user-email" id="user-email-disp"></div>
+          <div class="user-email-disp" id="user-email-disp"></div>
+          <div class="user-badge" id="user-badge">Connecté</div>
         </div>
       </div>
 
@@ -1279,26 +1539,122 @@
           <div class="sched-pill pill-off">OFF</div>
         </div>
       </div>
+      
+      <!-- Bilan Hebdomadaire -->
+      <div class="section-title">Bilan Hebdomadaire</div>
+      <div class="report-card">
+        <div class="report-header">
+          <div class="report-icon">📊</div>
+          <div>
+            <div class="report-title">Rapport EnergiaMaison</div>
+            <div class="report-subtitle">Semaine en cours</div>
+          </div>
+        </div>
+        <div class="report-summary">
+          <p><strong>Température moyenne :</strong> 22.4°C</p>
+          <p><strong>Consommation électrique :</strong> Stable (15 kWh)</p>
+          <p class="report-ok">✓ Aucun problème de sécurité détecté.</p>
+        </div>
+        <div class="report-chart">
+          <canvas id="weeklyChart" height="150"></canvas>
+        </div>
+      </div>
 
-      <div class="footer">EnergiaMaison v2.0 · Backend Flask · ESP32 DHT22</div>
+      <div class="footer">EnergiaMaison v2.2 · Flask + OpenCV + ESP32 + Chart.js</div>
     </div>
   </div>
 
   <script>
-    // ── USERS STORE (localStorage) ──────────────────────────────
+    // Utilise l'origine du serveur Flask automatiquement
+    // Si ouvert via http://localhost:5000 → API = http://localhost:5000/api
+    // Si ouvert directement en fichier → fallback localhost:5000
+    const API = (window.location.protocol === 'http:' || window.location.protocol === 'https:')
+      ? `${window.location.protocol}//${window.location.host}/api`
+      : 'http://localhost:5000/api';
+    const bulbSVG = `<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.6 1.4 4.9 3.5 6.2V17a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-1.8C17.6 13.9 19 11.6 19 9a7 7 0 0 0-7-7zm-1 17h2v1h-2v-1z"/></svg>`;
+
+    // ── STORAGE ───────────────────────────────────────────────────
+    // Stocke users ET le mapping email→folder pour la reconnexion faciale
     function getUsers() { try { return JSON.parse(localStorage.getItem('em_users') || '{}'); } catch { return {}; } }
     function saveUsers(u) { localStorage.setItem('em_users', JSON.stringify(u)); }
     function getSession() { return localStorage.getItem('em_session'); }
-    function setSession(email) { localStorage.setItem('em_session', email); }
-    function clearSession() { localStorage.removeItem('em_session'); }
+    function getSessionMethod() { return localStorage.getItem('em_method') || 'email'; }
+    function setSession(email, method) {
+      localStorage.setItem('em_session', email);
+      localStorage.setItem('em_method', method || 'email');
+    }
+    function clearSession() {
+      localStorage.removeItem('em_session');
+      localStorage.removeItem('em_method');
+    }
 
-    // ── BOOT ────────────────────────────────────────────────────
+    // ── CHARTS ───────────────────────────────────────────────────
+    function initWeeklyChart() {
+      const ctx = document.getElementById('weeklyChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+          datasets: [{
+            label: 'Consommation (kWh)',
+            data: [2.1, 2.3, 2.0, 2.4, 2.2, 2.6, 2.5],
+            borderColor: '#378ADD',
+            backgroundColor: 'rgba(55, 138, 221, 0.1)',
+            borderWidth: 2,
+            pointBackgroundColor: '#378ADD',
+            fill: true,
+            tension: 0.4
+          },
+          {
+            label: 'Température (°C)',
+            data: [21.5, 22.0, 22.4, 23.1, 22.8, 22.5, 22.4],
+            borderColor: '#1D9E75',
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            borderDash: [5, 5],
+            pointBackgroundColor: '#1D9E75',
+            fill: false,
+            tension: 0.4,
+            yAxisID: 'y1',
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: { boxWidth: 10, font: { family: "'DM Sans', sans-serif", size: 11 } }
+            }
+          },
+          scales: {
+            x: { grid: { display: false } },
+            y: { 
+              beginAtZero: true, 
+              max: 4,
+              ticks: { stepSize: 1 },
+              grid: { color: 'rgba(0,0,0,0.05)' }
+            },
+            y1: {
+              position: 'right',
+              beginAtZero: false,
+              min: 20, max: 25,
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }
+
+    // ── BOOT ─────────────────────────────────────────────────────
     window.onload = function () {
-      const sess = getSession();
-      if (sess) { showDashboard(sess); }
+      initWeeklyChart();
+      const s = getSession();
+      if (s) showDashboard(s, getSessionMethod());
     };
 
-    // ── TAB SWITCH ───────────────────────────────────────────────
+    // ── TABS ─────────────────────────────────────────────────────
     function switchTab(tab) {
       document.getElementById('form-login').style.display = tab === 'login' ? '' : 'none';
       document.getElementById('form-signup').style.display = tab === 'signup' ? '' : 'none';
@@ -1307,50 +1663,37 @@
       hideError();
     }
 
-    // ── VALIDATION HELPERS ───────────────────────────────────────
-    function validateEmail(input, iconId) {
+    // ── VALIDATION ────────────────────────────────────────────────
+    function validateEmail(input) {
       const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value);
       input.classList.toggle('valid', ok && input.value.length > 0);
       input.classList.toggle('invalid', !ok && input.value.length > 0);
       return ok;
     }
 
-    function validateLoginPw(input) {
-      const ok = input.value.length >= 1;
-      // Enable login button if both fields ok
-      const emailOk = validateEmail(document.getElementById('login-email'), 'login-email-icon');
-      document.getElementById('btn-login').disabled = !(emailOk && ok);
-    }
-
-    // Password conditions
-    const conds = {
+    const pwConds = {
       upper: v => /^[A-Z]/.test(v),
       lower: v => /[a-z]/.test(v),
       digit: v => /[0-9]/.test(v),
-      symbol: v => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(v),
+      symbol: v => /[!@#$%^&*()\-_=+\[\]{};':",.<>?]/.test(v),
       length: v => v.length >= 8,
     };
-    const strengthColors = ['#E24B4A', '#E8863C', '#EF9F27', '#1D9E75'];
-    const strengthLabels = ['Très faible', 'Faible', 'Moyen', 'Fort', 'Très fort'];
+    const sColors = ['#E24B4A', '#E8863C', '#EF9F27', '#1D9E75'];
+    const sLabels = ['Très faible', 'Faible', 'Moyen', 'Fort', 'Très fort'];
 
     function validatePassword(input) {
-      const v = input.value;
-      let score = 0;
-      Object.entries(conds).forEach(([key, fn]) => {
-        const ok = fn(v);
-        if (ok) score++;
-        const el = document.getElementById('cond-' + key);
+      const v = input.value; let score = 0;
+      Object.entries(pwConds).forEach(([k, fn]) => {
+        const ok = fn(v); if (ok) score++;
+        const el = document.getElementById('cond-' + k);
         el.classList.toggle('ok', ok);
         el.classList.toggle('fail', !ok && v.length > 0);
       });
-      // Strength bar
-      const segs = ['s1', 's2', 's3', 's4'];
-      segs.forEach((id, i) => {
-        const el = document.getElementById(id);
-        el.style.background = i < score ? strengthColors[Math.min(score - 1, 3)] : '#E6EDF5';
+      ['s1', 's2', 's3', 's4'].forEach((id, i) => {
+        document.getElementById(id).style.background = i < score ? sColors[Math.min(score - 1, 3)] : '#E6EDF5';
       });
       document.getElementById('strength-text').textContent =
-        v.length === 0 ? 'Entrez un mot de passe' : strengthLabels[Math.min(score, 4)];
+        v.length === 0 ? 'Entrez un mot de passe' : sLabels[Math.min(score, 4)];
       input.classList.toggle('valid', score === 5);
       input.classList.toggle('invalid', score < 5 && v.length > 0);
       return score === 5;
@@ -1365,98 +1708,317 @@
       return ok;
     }
 
-    function checkSignup() {
-      const emailOk = validateEmail(document.getElementById('signup-email'), 'signup-email-icon');
-      const pwOk = validatePassword(document.getElementById('signup-pw'));
-      const cfOk = validateConfirm();
-      document.getElementById('btn-signup').disabled = !(emailOk && pwOk && cfOk);
+    function checkLogin() {
+      const eOk = validateEmail(document.getElementById('login-email'));
+      const pOk = document.getElementById('login-pw').value.length > 0;
+      document.getElementById('btn-login').disabled = !(eOk && pOk);
     }
 
-    // ── TOGGLE PASSWORD VISIBILITY ──────────────────────────────
+    function checkSignup() {
+      const eOk = validateEmail(document.getElementById('signup-email'));
+      const pOk = validatePassword(document.getElementById('signup-pw'));
+      const cOk = validateConfirm();
+      document.getElementById('btn-signup').disabled = !(eOk && pOk && cOk);
+    }
+
     function togglePw(id, btn) {
       const input = document.getElementById(id);
-      const show = input.type === 'password';
-      input.type = show ? 'text' : 'password';
-      btn.style.opacity = show ? '0.8' : '0.4';
+      input.type = input.type === 'password' ? 'text' : 'password';
+      btn.style.opacity = input.type === 'text' ? '0.8' : '0.4';
     }
 
-    // ── ERROR DISPLAY ─────────────────────────────────────────────
-    function showError(msg) {
-      const el = document.getElementById('error-box');
-      el.textContent = msg;
-      el.classList.add('visible');
-    }
-    function hideError() {
-      document.getElementById('error-box').classList.remove('visible');
-    }
+    function showError(msg) { const el = document.getElementById('error-box'); el.textContent = msg; el.classList.add('visible'); }
+    function hideError() { document.getElementById('error-box').classList.remove('visible'); }
 
-    // ── RIPPLE EFFECT ─────────────────────────────────────────────
-    function addRipple(btn, e) {
-      const r = document.createElement('span');
-      r.className = 'ripple';
-      const rect = btn.getBoundingClientRect();
-      const size = Math.max(rect.width, rect.height);
-      r.style.width = r.style.height = size + 'px';
-      r.style.left = (e.clientX - rect.left - size / 2) + 'px';
-      r.style.top = (e.clientY - rect.top - size / 2) + 'px';
-      btn.appendChild(r);
-      setTimeout(() => r.remove(), 600);
-    }
-
-    // ── LOGIN ────────────────────────────────────────────────────
+    // ── LOGIN EMAIL ───────────────────────────────────────────────
     function doLogin(e) {
-      addRipple(e.currentTarget, e);
       hideError();
       const email = document.getElementById('login-email').value.trim();
       const pw = document.getElementById('login-pw').value;
       const users = getUsers();
       if (!users[email]) { showError('Aucun compte trouvé avec cet email.'); return; }
       if (users[email].password !== btoa(pw)) { showError('Mot de passe incorrect.'); return; }
-      setSession(email);
-      showDashboard(email);
+      setSession(email, 'email');
+      showDashboard(email, 'email');
     }
 
-    // ── SIGNUP ───────────────────────────────────────────────────
+    // ── SIGNUP ────────────────────────────────────────────────────
+    // FIX : ne redirige PAS vers le dashboard immédiatement
+    // Montre les étapes d'enregistrement du visage
+    let pendingEmail = '';
+
     function doSignup(e) {
-      addRipple(e.currentTarget, e);
       hideError();
       const email = document.getElementById('signup-email').value.trim();
       const pw = document.getElementById('signup-pw').value;
       const users = getUsers();
       if (users[email]) { showError('Un compte existe déjà avec cet email.'); return; }
-      users[email] = { password: btoa(pw), email };
+
+      // Sauvegarde le compte avec email stocké exactement comme clé
+      users[email] = { password: btoa(pw), email: email, faceFolder: null };
       saveUsers(users);
-      setSession(email);
-      showDashboard(email);
+      pendingEmail = email;
+      localStorage.setItem('em_pending', email); // FIX : persiste meme si la page recharge
+
+      // Cache le formulaire de création, montre les étapes
+      document.getElementById('btn-signup').style.display = 'none';
+      document.getElementById('steps-face').classList.add('visible');
+      document.getElementById('btn-face-register').style.display = '';
+      document.getElementById('btn-face-register').disabled = false;
+      document.getElementById('btn-skip-face').style.display = '';
+
+      // Désactive les champs email/pw
+      document.getElementById('signup-email').disabled = true;
+      document.getElementById('signup-pw').disabled = true;
+      document.getElementById('signup-confirm').disabled = true;
     }
 
-    // ── LOGOUT ───────────────────────────────────────────────────
+    // ── FACE REGISTER ─────────────────────────────────────────────
+    async function doFaceRegister() {
+      const email = pendingEmail;
+      if (!email) { showError('Erreur : email introuvable.'); return; }
+
+      const statusEl = document.getElementById('face-reg-status');
+      const msgEl = document.getElementById('face-reg-msg');
+      const btn = document.getElementById('btn-face-register');
+      const skipBtn = document.getElementById('btn-skip-face');
+
+      btn.disabled = true;
+      skipBtn.disabled = true;
+      statusEl.className = 'face-status loading';
+      msgEl.textContent = 'Webcam ouverte — regardez la caméra et bougez légèrement la tête...';
+
+      // Met à jour step2 en actif
+      document.getElementById('step2').classList.add('active');
+
+      try {
+        await fetch(`${API}/face/register`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        // Polling : vérifie toutes les 2s si la capture est terminée
+        let attempts = 0;
+        const poll = setInterval(async () => {
+          attempts++;
+          try {
+            const res = await fetch(`${API}/face/register/status?email=${encodeURIComponent(email)}`);
+            const data = await res.json();
+
+            if (data.status === 'termine') {
+              clearInterval(poll);
+
+              // ── FIX CLEF : stocke le folder exactement comme face_auth le génère
+              const folder = email.replace('@', '_at_').replace(/\./g, '_');
+              const users = getUsers();
+              if (users[email]) users[email].faceFolder = folder;
+              saveUsers(users);
+
+              // Met à jour étapes
+              document.getElementById('step2').className = 'step-item done';
+              document.getElementById('step2').innerHTML = '<div class="step-num">✓</div>Visage enregistré avec succès !';
+              document.getElementById('step3').className = 'step-item active';
+
+              statusEl.className = 'face-status ok';
+              msgEl.textContent = '✓ Visage enregistré ! Redirection vers le dashboard...';
+
+              // ── FIX : ouvre le dashboard APRÈS confirmation
+              setTimeout(() => {
+                setSession(email, 'face');
+                showDashboard(email, 'face');
+              }, 1500);
+
+            } else if (data.status === 'erreur' || attempts > 40) {
+              clearInterval(poll);
+              statusEl.className = 'face-status err';
+              const errMsg = data.error || 'Problème de capture webcam.';
+              msgEl.textContent = `Erreur : ${errMsg} — Cliquez "Passer" pour accéder au dashboard.`;
+              btn.disabled = false;
+              skipBtn.disabled = false;
+            } else {
+              const secs = attempts * 2;
+              msgEl.textContent = `Capture en cours... ${secs}s — restez devant la caméra`;
+            }
+          } catch {
+            msgEl.textContent = 'Vérification en cours...';
+          }
+        }, 2000);
+
+      } catch {
+        statusEl.className = 'face-status err';
+        msgEl.textContent = 'Backend non accessible. Vérifiez que app.py tourne.';
+        btn.disabled = false;
+        skipBtn.disabled = false;
+      }
+    }
+
+    // ── SKIP FACE ─────────────────────────────────────────────────
+    // FIX : lit depuis localStorage si pendingEmail perdu au rechargement
+    function skipFace() {
+      // Recupere l email depuis variable ou localStorage
+      const email = pendingEmail || localStorage.getItem('em_pending') || '';
+      console.log('skipFace email:', email);
+      if (!email) {
+        // Cherche dans les users le dernier inscrit
+        const users = getUsers();
+        const keys = Object.keys(users);
+        if (keys.length > 0) {
+          const lastEmail = keys[keys.length - 1];
+          setSession(lastEmail, 'email');
+          showDashboard(lastEmail, 'email');
+          return;
+        }
+        alert('Session expirée. Veuillez recommencer l\'inscription.');
+        switchTab('signup');
+        return;
+      }
+      localStorage.removeItem('em_pending');
+      pendingEmail = '';
+      setSession(email, 'email');
+      showDashboard(email, 'email');
+    }
+
+    // ── FACE LOGIN ────────────────────────────────────────────────
+    // FIX : après reconnaissance, cherche l'email dans localStorage
+    // via le faceFolder stocké lors de l'inscription
+    async function doFaceLogin() {
+      const statusEl = document.getElementById('face-login-status');
+      const msgEl = document.getElementById('face-login-msg');
+      const btn = document.getElementById('btn-face-login');
+
+      btn.disabled = true;
+      statusEl.className = 'face-status loading';
+      msgEl.textContent = 'Webcam ouverte — regardez la caméra...';
+      hideError();
+
+      try {
+        const res = await fetch(`${API}/face/login`, { method: 'POST' });
+        const data = await res.json();
+
+        if (res.ok && data.folder) {
+          // FIX : retrouve l'email en cherchant dans les users par faceFolder
+          const users = getUsers();
+          let foundEmail = null;
+
+          // Cherche d'abord par faceFolder exact
+          for (const [em, u] of Object.entries(users)) {
+            if (u.faceFolder && u.faceFolder === data.folder) {
+              foundEmail = em; break;
+            }
+          }
+
+          // Fallback : cherche par email reconstruit
+          if (!foundEmail) {
+            for (const [em] of Object.entries(users)) {
+              const f = em.replace('@', '_at_').replace(/\./g, '_');
+              if (f === data.folder) { foundEmail = em; break; }
+            }
+          }
+
+          if (foundEmail) {
+            statusEl.className = 'face-status ok';
+            msgEl.textContent = `✓ Bienvenue ${foundEmail.split('@')[0]} !`;
+            setTimeout(() => {
+              setSession(foundEmail, 'face');
+              showDashboard(foundEmail, 'face');
+            }, 800);
+          } else {
+            // Visage reconnu mais pas de compte local → crée un compte automatiquement
+            statusEl.className = 'face-status err';
+            msgEl.textContent = 'Visage reconnu mais aucun compte trouvé. Inscrivez-vous d\'abord.';
+            btn.disabled = false;
+          }
+
+        } else {
+          statusEl.className = 'face-status err';
+          const errMsg = data.error || 'Visage non reconnu ou caméra occupée.';
+          msgEl.textContent = `${errMsg} Réessayez ou utilisez email + mot de passe.`;
+          btn.disabled = false;
+        }
+
+      } catch {
+        statusEl.className = 'face-status err';
+        msgEl.textContent = 'Backend non accessible. Lancez python app.py';
+        btn.disabled = false;
+      }
+    }
+
+    // ── LOGOUT ────────────────────────────────────────────────────
     function doLogout() {
       clearSession();
+      pendingEmail = '';
       document.getElementById('auth-section').style.display = '';
       document.getElementById('dashboard').style.display = 'none';
+      // Reset form
       document.getElementById('login-email').value = '';
       document.getElementById('login-pw').value = '';
       document.getElementById('btn-login').disabled = true;
+      document.getElementById('face-login-status').className = 'face-status';
+      document.getElementById('btn-face-login').disabled = false;
+      // Reset signup form
+      document.getElementById('btn-signup').style.display = '';
+      document.getElementById('btn-signup').disabled = true;
+      document.getElementById('steps-face').classList.remove('visible');
+      document.getElementById('btn-face-register').style.display = 'none';
+      document.getElementById('btn-skip-face').style.display = 'none';
+      document.getElementById('face-reg-status').className = 'face-status';
+      document.getElementById('signup-email').disabled = false;
+      document.getElementById('signup-pw').disabled = false;
+      document.getElementById('signup-confirm').disabled = false;
+      switchTab('login');
     }
 
-    // ── SHOW DASHBOARD ───────────────────────────────────────────
-    function showDashboard(email) {
-      document.getElementById('auth-section').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
-      // User info
-      const initials = email[0].toUpperCase();
-      document.getElementById('user-avatar').textContent = initials;
-      document.getElementById('user-name').textContent = 'Bonjour, ' + email.split('@')[0];
-      document.getElementById('user-email-disp').textContent = email;
-      // Init dashboard
-      initDashboard();
+    // ── SHOW DASHBOARD ────────────────────────────────────────────
+    function showDashboard(email, method) {
+      console.log('showDashboard starting for:', email);
+      try {
+        if (!email || email.trim() === '') {
+          console.error('showDashboard: email vide !');
+          switchTab('login');
+          return;
+        }
+
+        const authSec = document.getElementById('auth-section');
+        const dashSec = document.getElementById('dashboard');
+
+        if (!dashSec) {
+          throw new Error('Element #dashboard introuvable dans le DOM');
+        }
+
+        // Met à jour les infos utilisateur
+        const avatar = document.getElementById('user-avatar');
+        const name = document.getElementById('user-name');
+        const emailDisp = document.getElementById('user-email-disp');
+        const badge = document.getElementById('user-badge');
+
+        if (avatar) avatar.textContent = email[0].toUpperCase();
+        if (name) name.textContent = 'Bonjour, ' + email.split('@')[0];
+        if (emailDisp) emailDisp.textContent = email;
+        if (badge) {
+          badge.textContent = method === 'face' ? '📷  Connecté par visage' : '🔑  Connecté par email';
+        }
+
+        // Switch de section
+        if (authSec) authSec.style.display = 'none';
+        dashSec.style.display = 'block';
+
+        localStorage.removeItem('em_pending');
+        pendingEmail = '';
+
+        initDashboard();
+        console.log('showDashboard success');
+      } catch (err) {
+        console.error('CRITICAL ERROR in showDashboard:', err);
+        alert('Erreur lors du chargement du dashboard : ' + err.message);
+        // Fallback : réaffiche l'auth si possible
+        const authSec = document.getElementById('auth-section');
+        if (authSec) authSec.style.display = 'block';
+      }
     }
 
-    // ══════════════════════════════════════════
-    // DASHBOARD LOGIC
-    // ══════════════════════════════════════════
-    const API = 'http://localhost:5000/api';
+    // ════════════════════════════════════════════════════════════
+    // DASHBOARD
+    // ════════════════════════════════════════════════════════════
     const lights = {
       salon: { name: 'Salon', room: 'Pièce principale', on: true, brightness: 80 },
       cuisine: { name: 'Cuisine', room: 'Zone repas', on: false, brightness: 60 },
@@ -1464,37 +2026,24 @@
       bureau: { name: 'Bureau', room: 'Télétravail', on: true, brightness: 100 },
     };
     const wattHistory = [];
-    const bulbSVG = `<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.6 1.4 4.9 3.5 6.2V17a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-1.8C17.6 13.9 19 11.6 19 9a7 7 0 0 0-7-7zm-1 17h2v1h-2v-1z"/></svg>`;
 
     function setConnected(ok) {
       const b = document.getElementById('conn-badge');
-      const l = document.getElementById('conn-label');
       b.className = 'conn-badge ' + (ok ? 'ok' : 'err');
-      l.textContent = ok ? 'Backend ESP32 connecté' : 'Backend déconnecté — vérifier app.py';
+      document.getElementById('conn-label').textContent =
+        ok ? 'Backend ESP32 connecté' : 'Backend déconnecté — vérifier app.py';
     }
 
     async function fetchSensors() {
       try {
-        const res = await fetch(`${API}/sensors`);
-        if (!res.ok) throw new Error();
-        const d = await res.json();
-        setConnected(true);
+        const res = await fetch(`${API}/sensors`); if (!res.ok) throw new Error();
+        const d = await res.json(); setConnected(true);
         document.getElementById('temp-val').textContent = d.temperature;
         document.getElementById('hum-val').textContent = d.humidity;
-        const tb = document.getElementById('temp-badge');
-        const ab = document.getElementById('alert-box');
-        const as = document.getElementById('alert-section');
-        if (d.temperature >= 27) {
-          tb.className = 'sensor-badge badge-high'; tb.textContent = 'Trop chaud';
-          ab.classList.add('visible'); as.style.display = '';
-          document.getElementById('alert-body').textContent = `${d.temperature}°C — activez la ventilation.`;
-        } else if (d.temperature >= 24) {
-          tb.className = 'sensor-badge badge-warm'; tb.textContent = 'Légèrement chaud';
-          ab.classList.add('visible'); as.style.display = '';
-        } else {
-          tb.className = 'sensor-badge badge-ok'; tb.textContent = 'Confort optimal';
-          ab.classList.remove('visible'); as.style.display = 'none';
-        }
+        const tb = document.getElementById('temp-badge'), ab = document.getElementById('alert-box'), as = document.getElementById('alert-section');
+        if (d.temperature >= 27) { tb.className = 'sensor-badge badge-high'; tb.textContent = 'Trop chaud'; ab.classList.add('visible'); as.style.display = ''; }
+        else if (d.temperature >= 24) { tb.className = 'sensor-badge badge-warm'; tb.textContent = 'Légèrement chaud'; ab.classList.add('visible'); as.style.display = ''; }
+        else { tb.className = 'sensor-badge badge-ok'; tb.textContent = 'Confort optimal'; ab.classList.remove('visible'); as.style.display = 'none'; }
         const hb = document.getElementById('hum-badge');
         if (d.humidity > 70) { hb.className = 'sensor-badge badge-high'; hb.textContent = 'Humidité élevée'; }
         else if (d.humidity < 40) { hb.className = 'sensor-badge badge-warm'; hb.textContent = 'Air sec'; }
@@ -1502,44 +2051,21 @@
       } catch { setConnected(false); }
     }
 
-    async function fetchLights() {
-      try {
-        const res = await fetch(`${API}/lights`);
-        if (!res.ok) throw new Error();
-        const data = await res.json();
-        Object.assign(lights, data);
-        renderLights();
-      } catch { renderLights(); }
-    }
-
     async function toggleLight(id) {
-      lights[id].on = !lights[id].on;
-      renderLights();
-      try {
-        await fetch(`${API}/lights/${id}`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ on: lights[id].on }),
-        });
-      } catch { }
+      lights[id].on = !lights[id].on; renderLights();
+      try { await fetch(`${API}/lights/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ on: lights[id].on }) }); } catch { }
     }
 
     async function setBrightness(id, val) {
-      lights[id].brightness = +val;
-      updateWatts();
-      try {
-        await fetch(`${API}/lights/${id}`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ brightness: +val }),
-        });
-      } catch { }
+      lights[id].brightness = +val; updateWatts();
+      try { await fetch(`${API}/lights/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ brightness: +val }) }); } catch { }
     }
 
     function renderLights() {
       document.getElementById('lights-grid').innerHTML = Object.entries(lights).map(([id, l]) => `
     <div class="light-card ${l.on ? 'on' : ''}" onclick="toggleLight('${id}')">
       <div class="light-icon ${l.on ? 'on' : 'off'}">${bulbSVG}</div>
-      <div class="light-name">${l.name}</div>
-      <div class="light-room">${l.room}</div>
+      <div class="light-name">${l.name}</div><div class="light-room">${l.room}</div>
       <div class="light-footer">
         <span class="light-status ${l.on ? 'on-text' : 'off-text'}">${l.on ? 'ALLUMÉ' : 'ÉTEINT'}</span>
         <label class="toggle" onclick="event.stopPropagation()">
@@ -1553,16 +2079,14 @@
           oninput="setBrightness('${id}',this.value);document.getElementById('brp-${id}').textContent=this.value+'%'">
         <span class="brightness-pct" id="brp-${id}">${l.brightness}%</span>
       </div>`: ''}
-    </div>
-  `).join('');
+    </div>`).join('');
       updateWatts();
     }
 
     function updateWatts() {
       const total = Object.values(lights).reduce((s, l) => s + (l.on ? Math.round(l.brightness * .6) : 0), 80);
       document.getElementById('watt-val').textContent = total;
-      wattHistory.push(total);
-      if (wattHistory.length > 12) wattHistory.shift();
+      wattHistory.push(total); if (wattHistory.length > 12) wattHistory.shift();
       const max = Math.max(...wattHistory, 1);
       document.getElementById('mini-chart').innerHTML = wattHistory.map((v, i) =>
         `<div class="mini-bar ${i === wattHistory.length - 1 ? 'active' : 'inactive'}" style="height:${Math.round(v / max * 100)}%"></div>`
@@ -1574,14 +2098,21 @@
         new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     }
 
+    let dashInit = false;
     function initDashboard() {
-      renderLights();
-      updateClock();
-      fetchSensors();
-      fetchLights();
-      setInterval(updateClock, 1000);
-      setInterval(fetchSensors, 5000);
-      setInterval(fetchLights, 10000);
+      if (dashInit) return;
+      console.log('initDashboard starting...');
+      try {
+        dashInit = true;
+        renderLights();
+        updateClock();
+        fetchSensors();
+        setInterval(updateClock, 1000);
+        setInterval(fetchSensors, 5000);
+        console.log('initDashboard scheduled intervals');
+      } catch (err) {
+        console.error('ERROR in initDashboard:', err);
+      }
     }
   </script>
 </body>

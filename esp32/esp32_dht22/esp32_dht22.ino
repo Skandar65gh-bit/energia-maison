@@ -2,11 +2,13 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include <DHT.h>
+#include "soc/soc.h"
+#include "soc/rtc_cntl_reg.h"
 
 // ── À MODIFIER ──────────────────────────────────
-const char* WIFI_SSID     = "NOM_DE_TON_WIFI";
-const char* WIFI_PASSWORD = "MOT_DE_PASSE_WIFI";
-const char* SERVER_URL    = "http://192.168.1.85:5000/api/sensors";
+const char* WIFI_SSID     = "Degle Degle";
+const char* WIFI_PASSWORD = "degla2026";
+const char* SERVER_URL    = "http://192.168.1.160:5000/api/sensors";
 // ────────────────────────────────────────────────
 
 #define DHT_PIN  4
@@ -14,6 +16,7 @@ const char* SERVER_URL    = "http://192.168.1.85:5000/api/sensors";
 DHT dht(DHT_PIN, DHT_TYPE);
 
 void setup() {
+  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); // Desactive le detecteur de sous-tension (Brownout)
   Serial.begin(115200);
   dht.begin();
 
